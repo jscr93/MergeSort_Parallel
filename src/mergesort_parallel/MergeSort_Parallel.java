@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package mergesort_parallel;
+import java.util.Arrays;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
@@ -15,8 +16,10 @@ public class MergeSort_Parallel {
 
     public void sort (Integer[] a) { 
         Integer[] helper = new Integer[a.length];
+        System.out.println(Arrays.toString(a));
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         forkJoinPool.invoke(new MergeSortTask(a, helper, 0, a.length-1));
+        System.out.println(Arrays.toString(helper));
     }
     
     private class MergeSortTask extends RecursiveAction {
@@ -46,6 +49,25 @@ public class MergeSort_Parallel {
             }
         }
         private void merge(Integer[] a, Integer[] helper, int lo, int mid, int hi) {
+            int leftEnd = mid - 1;
+            int tmpPos = lo;
+            int numElements = hi - lo + 1;
+            while ( lo <= leftEnd && mid <= hi) { //Main loop
+                if(a[lo] < a[mid]){
+                    helper[tmpPos++] = a[lo++];
+                } else {
+                    helper[tmpPos++] = a[mid++];
+                }
+            }
+            while(lo <= leftEnd){
+                helper[tmpPos++] = a[lo++];              //Copy the rest of first half
+            }
+            while(mid <= hi){
+                helper[tmpPos++] = a[mid++];             //Copy rest of right half
+            }
+            for (int i = 0; i < numElements; i ++, hi--){ //Copy TmpArray back
+                a[hi] = helper[hi];
+            }
         }
     } 
     /**
@@ -53,6 +75,8 @@ public class MergeSort_Parallel {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Integer[] array = {8,7,6,9,5,3,3,4,1,2};
+        new MergeSort_Parallel().sort(array);
     }
     
 }
